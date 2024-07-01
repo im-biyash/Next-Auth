@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import bycrypt from "bcryptjs";
-import User from "@/models/userModel";
+import User from "@/models/userModel.";
 export const sendEmail = async ({ email, emailType, userId }: any) => {
   try {
     // todo configure mail for usage
@@ -26,7 +26,7 @@ export const sendEmail = async ({ email, emailType, userId }: any) => {
       },
     });
     const mailOptions = {
-      from: "bsstha@gmail.com.ai",
+      from: "bsstha@gmail.com.aiii",
       to: email,
       subject: emailType === "verify" ? "Email Verification" : "Password Reset",
       html: `<>Click the link below <a href="${
