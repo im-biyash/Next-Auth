@@ -1,9 +1,10 @@
 import nodemailer from "nodemailer";
+import User from "@/models/userModel"
 import bycrypt from "bcryptjs";
-import User from "@/models/userModel.";
+
 export const sendEmail = async ({ email, emailType, userId }: any) => {
   try {
-    // todo configure mail for usage
+
     const hashedToken = await bycrypt.hash(userId.toString(), 10);
     if (emailType === "VERIFY") {
       await User.findByIdAndUpdate(userId, {
