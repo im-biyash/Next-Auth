@@ -29,11 +29,9 @@ export async function POST(request: NextRequest) {
             email: user.email,
         };
 
-        if (!process.env.TOKEN_SECRET) {
-            throw new Error("TOKEN_SECRET environment variable is not defined");
-        }
+    
 
-        const token = jwt.sign(tokenData, process.env.TOKEN_SECRET, { expiresIn: "1d" });
+        const token =  jwt.sign(tokenData, process.env.TOKEN_SECRET!, { expiresIn: "1d" });
 
         const response = NextResponse.json({ message: "User logged in successfully", success: true }, { status: 200 });
         response.cookies.set("token", token, {
