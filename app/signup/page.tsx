@@ -1,61 +1,81 @@
-
 'use client'
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+    username: "",
+  });
+  const router = useRouter();
+
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+ 
+
+  const onSignup = async (e:any) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:3000/api/users/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Sign up failed");
-      }
-
-      // Optionally handle success response
-      console.log("User registered successfully");
-
-      // Reset form fields and state
-      setEmail("");
-      setPassword("");
-      setError("");
-    } catch (error) {
-      setError("Failed to sign up");
-      console.error("Signup Error:", error);
+      setLoading(true);
+      const response = await axios.post("/api/users/signup", user);
+      console.log("Signup success", response);
+      router.push("/login");
+    } catch (err:any) {
+      console.log(err);
+      setError(err.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (user.email.length > 0 && user.password.length > 0 && user.username.length > 0) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [user]);
+
+  const handleChange = (e:any) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({
+      ...prevUser,
+      [name]: value,
+    }));
+  };
+
+
   return (
     <div className="flex justify-center items-center h-screen">
-      <Card className="w-80 h-[400px] rounded-xl border-blue-300">
+      <Card className="w-80 h-[500px] rounded-xl border-blue-300">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Register</CardTitle>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSignup}>
           <CardContent>
             <h1 className="p-1">Email</h1>
             <Input
               placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={user.email}
+              onChange={handleChange}
+            />
+          </CardContent>
+          <CardContent>
+            <h1 className="p-1">Username</h1>
+            <Input
+              placeholder="Enter your username"
+              name="username"
+              value={user.username}
+              onChange={handleChange}
             />
           </CardContent>
           <CardContent>
@@ -63,12 +83,13 @@ const Signup = () => {
             <Input
               placeholder="Enter your password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={user.password}
+              onChange={handleChange}
             />
           </CardContent>
           <CardFooter className="flex flex-col w-full gap-2 justify-center">
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full" disabled={loading || buttonDisabled}>
               {loading ? "Signing up..." : "Signup"}
             </Button>
             {error && <p className="text-red-500">{error}</p>}
@@ -81,4 +102,3 @@ const Signup = () => {
 };
 
 export default Signup;
-        
